@@ -1,0 +1,44 @@
+[
+  {
+    "id": "metric_net_revenue",
+    "term": "Net Revenue",
+    "definition": "Total sale_price from order_items where status is not 'Cancelled' and not 'Returned'.",
+    "formula": "SUM(oi.sale_price) FILTERING oi.status NOT IN ('Cancelled', 'Returned')",
+    "tables": ["order_items"]
+  },
+  {
+    "id": "metric_gmv",
+    "term": "Gross Merchandise Value (GMV)",
+    "definition": "Total sale_price across all order_items regardless of cancellation or return status.",
+    "formula": "SUM(oi.sale_price)",
+    "tables": ["order_items"]
+  },
+  {
+    "id": "metric_aov",
+    "term": "Average Order Value (AOV)",
+    "definition": "Net revenue divided by the count of distinct non-cancelled, non-returned orders.",
+    "formula": "SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id))",
+    "tables": ["order_items", "orders"]
+  },
+  {
+    "id": "metric_return_rate",
+    "term": "Return Rate",
+    "definition": "Percentage of order items with status = 'Returned' out of all non-cancelled items.",
+    "formula": "SAFE_DIVIDE(COUNTIF(oi.status = 'Returned'), COUNTIF(oi.status != 'Cancelled')) * 100",
+    "tables": ["order_items"]
+  },
+  {
+    "id": "metric_repeat_purchase_rate",
+    "term": "Repeat Purchase Rate",
+    "definition": "Percentage of distinct users who placed 2 or more non-cancelled orders out of all users with at least 1 non-cancelled order.",
+    "formula": "SAFE_DIVIDE(COUNTIF(order_count >= 2), COUNT(*)) * 100",
+    "tables": ["orders", "users"]
+  },
+  {
+    "id": "metric_gross_margin",
+    "term": "Gross Profit and Margin",
+    "definition": "Gross profit is order_items.sale_price minus products.cost for completed/shipped items; gross margin is gross profit divided by sale_price.",
+    "formula": "SUM(oi.sale_price - p.cost) and SAFE_DIVIDE(SUM(oi.sale_price - p.cost), SUM(oi.sale_price)) * 100",
+    "tables": ["order_items", "products"]
+  }
+]

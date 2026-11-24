@@ -1,0 +1,19 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Environment & credentials
+.env
+*.json
+!data/*.json
+!eval/*.json
+
+# Local runtime storage
+storage/chroma_db/*
+!storage/chroma_db/.gitkeep
+storage/*.db
+storage/*.sqlite3
