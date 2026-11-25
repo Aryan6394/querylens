@@ -1,5 +1,5 @@
 # QueryLens — Natural Language Analytics Engine for Google BigQuery
-
+![CI](https://github.com/Aryan6394/querylens/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688)
 ![Streamlit](https://img.shields.io/badge/Streamlit-Frontend-FF4B4B)
@@ -109,8 +109,51 @@ python -m scripts.index_schema
 ```
 
 ### 4. Run Backend & Frontend
-```bash
-# Terminal 1 — FastAPI Backend (Swagger docs at http://localhost:8000/docs)
-uvicorn app.main:app --reload --port 8000
+### 4. Run Locally (Multi-Terminal Setup)
 
-# Terminal 2 — Streamlit UI (Dashboard at http
+Open all terminals from the project root (`querylens/`) and start the services in order:
+
+#### Prerequisite — Ollama (Local LLM)
+Ensure the **Ollama** app is running in the background (or start it manually in a dedicated terminal):
+```bash
+ollama serve
+```
+
+#### Terminal 1 — FastAPI Backend (`http://localhost:8000`)
+```bash
+# Activate virtual environment (Windows: .\.venv\Scripts\Activate.ps1 | macOS/Linux: source .venv/bin/activate)
+uvicorn app.main:app --reload --port 8000
+```
+* Wait for `Application startup complete.`
+* Interactive Swagger API docs: `http://localhost:8000/docs`
+
+#### Terminal 2 — Streamlit UI (`http://localhost:8501`)
+Keep Terminal 1 running, open a second terminal, and run:
+```bash
+# Activate virtual environment
+streamlit run ui/streamlit_app.py
+```
+* Opens at `http://localhost:8501` — confirm the sidebar shows a green **Backend Connected** badge.
+
+#### Terminal 3 — Utility Terminal *(Optional)*
+Keep both servers running and use a third terminal for indexing, tests, and evaluation runs:
+```bash
+# Re-index ChromaDB (only needed after editing glossary/examples or clearing storage/)
+python -m scripts.index_schema
+
+# Lint, unit tests, and 12-case evaluation suite
+ruff check app/ ui/ eval/ scripts/ tests/
+pytest -v
+python -m eval.run_eval
+```
+
+#### Local Services Overview
+
+| Terminal | Service | Port / URL | Keep Open? |
+| :--- | :--- | :--- | :--- |
+| **Background / App** | Ollama (`qwen2.5-coder:3b`) | `localhost:11434` | Yes |
+| **Terminal 1** | FastAPI (`uvicorn`) | `http://localhost:8000/docs` | Yes |
+| **Terminal 2** | Streamlit UI | `http://localhost:8501` | Yes |
+| **Terminal 3** | Tests / Evals / Git | — | Optional |
+
+Press `Ctrl + C` in Terminal 1 and Terminal 2 to stop the servers.
